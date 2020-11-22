@@ -1,2 +1,2 @@
 # solvingAlgorithm
-C++ algorithm with VS
+C++ & C# algorithm with VS
