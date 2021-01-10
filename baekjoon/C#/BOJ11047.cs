@@ -10,6 +10,11 @@ namespace chapter11_12
         {
             int N = 0, K = 0, count = 0, i = 0;
 
+            //C#에서 공백으로 구별하여 입력 받는 법!!
+            string[] input = Console.ReadLine().Split(' ');
+            int num = int.Parse(input[0]);
+            int target_value = int.Parse(input[1]);
+/*
             string input = Console.ReadLine();
             foreach(char digit in input)
             {
@@ -24,6 +29,7 @@ namespace chapter11_12
                 }
             }
             i = 0;
+*/
             int[] A = new int[N];
             for(int j = 0; j < N; j++)
             {
