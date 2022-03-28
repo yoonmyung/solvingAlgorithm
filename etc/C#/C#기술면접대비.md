@@ -415,8 +415,46 @@ using [namespace이름]; 형태로 사용하며, 이는 namespace에 포함된 �
 
 
 ### delegate VS event 
-
-
+* delegate   
+  콜백 기능을 함(메소드의 매개변수로 값이 아닌 코드, 즉 메소드를 넘기고 싶을 때 사용)   
+  참조 형식의 데이터 형식. 클래스처럼 인스턴스를 생성해야 함   
+  클래스같은 녀석이므로 클래스 바깥에서 우선 선언되며, 동일한 리턴타입과 매개변수 조합을 가진 메소드만 저장할 수 있다.   
+  ```
+  namespace a
+  {
+    delegate int DelegateA(int a, int b);
+    class aa
+    {
+      public int plus(int a, int b)
+      {
+        return a+b;
+      }
+      public int minus(int a, int b)
+      {
+        return a-b;
+      }
+      public static void print(int a, int b, DelegateA delegatee)
+      {
+        Console.WriteLine(delegatee(a, b));
+      }
+    }
+    class Program
+    {
+      public static void Main()
+      {
+        aa a = new aa();
+        DelegateA delegateA;
+        delegateA = new DelegateA(aa.plus);
+        delegateA += new DelegateA(aa.minus); // 이런식으로 여러 개 함수를 추가할 수도 있음. 
+        aa.print(2, 1, delegateA); // plus, minus 함수가 순차적으로 실행됨 (delegate 체인)
+      }
+    }
+  }
+  ```
+* event   
+  delegate와 선언 및 사용 방식은 비슷하나, delegate는 콜백을 위한 목적이라면 event는 사건 발생을 알리는 목적이 크다.   
+  송신자 클래스와 수신자 클래스를 나눠서 생각하면 이해하기 편하다.   
+  
 
 ### Thread VS Task
 C# 명령어에서는 Thread도 존재하고 Task도 존재함 둘의 차이가 무엇일까   
