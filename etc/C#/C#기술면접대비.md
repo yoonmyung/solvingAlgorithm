@@ -483,9 +483,86 @@ a = "kk";
 # Unity
 
 
-### Coroutine
+### 생명주기   
 
 
-### 스크립트 실행순서
+### Coroutine   
+1. 함수는 하나의 유니티 프레임에서 수행되는데(덩어리져있다고 생각하면 쉽다.)   
+이는 함수가 한 프레임에 수행하기에 긴 로직 혹은 시간 경과와 함께하는 일련의 이벤트에는 사용할 수 없음을 뜻한다.(덩어리를 작게 쪼갤 수 없다는 뜻)   
+이를 가능하게 해주는 것이 코루틴이다!   
+2. 또한 Update문을 사용하면 원하든 원하지 않든 매 프레임마다 계속 반복적으로 실행되지만,   
+Coroutine을 사용한다면   
+2-1. 필요한 순간에만 반복하고 필요하지 않을 때에는 전혀 사용하지 않음으로써 자원관리를 효과적으로 할 수 있다.   
+2-2. 그 밖에도 당장 실행되는게 아니라 일정 시간동안 멈춰있다가 그 뒤에 동작하게 하거나 특정 조건을 부여해서 코드가 실행되도록 할 수도 있다.   
+   
+(+) 코루틴은 쓰레드가 생성되는 멀티스레드 방식으로 느껴질 수 있다.   
+하지만 코루틴은 싱글 스레드로 비동기 방식을 구현한다. 순차 처리로부터 동시성을 구현한다.   
+![image](https://user-images.githubusercontent.com/40621689/160411798-80cb78c9-d2bd-4020-bcd4-6a232d952162.png)   
+
+```
+IEnumerator 함수명()
+{
+  yield return + 조건;
+  [함수 내용]
+  // 함수 내용에 반복문을 사용한다면 마치 Update문처럼 매 프레임마다 반복되게 할 수 있다. Update문은 따로 동작하면서도 말이다.
+  // 업데이트문에 이런 반복문을 쓰게 되면 해당 반복이 끝날 때까지, 반복문 아래에 있는 코드들은 전혀 실행이 되지 않는다.
+  // 그러나 코루틴에서 반복문을 사용하면 Update와는 별도로 동작하기 때문에 모든 스크립트가 정상적으로 동작하게 된다.
+}
+```
+```
+//매 프레임마다 점점 흐려지는 함수
+IEnumerator Fade() 
+{
+    for (float f = 1f; f >= 0; f -= 0.1f) 
+    {
+        Color c = renderer.material.color;
+        c.a = f;
+        renderer.material.color = c;
+        yield return null;
+    }
+}
+
+void Update() 
+{
+    if (Input.GetKeyDown("f")) 
+    {
+        StartCoroutine("Fade");
+        // StopCoroutine()도 존재한다.
+    }
+}
+```
+* IEnumerator   
+  IEnumerable은 배열과 같은 복합 데이터 형식의 데이터를 하나씩 넘겨주는 역할을 한다.   
+  IEnumerator는 Current라는 멤버변수와 MoveNext()라는 멤버함수를 가진다.   
+  IEnumerator는 이를 사용해 IEnumerable로부터 MoveNext()로 데이터 하나씩 이동한다.(코드 한줄씩 이동이라 이해해도 됨)   
+  코드 진행중 **yield return X 나 yield break를 마주친 지점이 IEnumerator.MoveNext() 함수가 중단되는 지점** 이다.   
+  yield로 넘겨주는 값이 Current 멤버 변수에 할당된다.   
+  [참고](https://www.slideshare.net/jungsoopark104/ienumerator)   
+  [출처](http://la-stranger.blogspot.com/2013/09/3d.html)
+  
+  
+* yield 명령어   
+  호출자에게 컬렉션 데이타를 하나씩 리턴할 때 사용한다.   
+  흔히 Enumerator(Iterator)라고 불리우는 이러한 기능은 집합적인 데이타셋으로부터 데이타를 하나씩 호출자에게 보내주는 역할을 한다.   
+  1. yield return은 컬렉션 데이타를 하나씩 리턴하는데 사용되고,   
+  2. yield break는 리턴을 중지하고 Iteration 루프를 빠져 나올 때 사용한다.   
+  다음에 함수 호출 시 yield문 이후부터 시작된다는 특징이 있다.   
+  유니티에서는 다음에 나올 값이 무엇인지 혹은 값이 더이상 없는지 를 가르쳐주는 키워드이다.   
+  따라서 코드 진행중 yield return X 나 yield break를 마주친 지점이 **IEnumerator.MoveNext() 함수가 중단되는 지점**이다.   
+  
+  
+* Coroutine 내에서 yield의 종류   
+  1. yield return null: 다음 프레임에 실행 됨.   
+  2. yield return new WaitForSeconds(float): 매개변수로 입력한 숫자에 해당하는 초만 큼 기다렸다가 실행됨.   
+  3. yield return new WaitForSecondsRealtime(flaot): 매개변수로 입력한 숫자에 해당하는 초만큼 기다렸다가 실행됨.   
+  4. yield return + new WaitForFixedUpdate / WaitForEndOfFrame 등...   
+  5. yield break: 일정 조건을 만족했을 때 코루틴이 끝나길 원한다면 이걸 사용하면 된다.   
+  (+)2번과 3번의 차이점   
+    유니티에서 시간은 TimeScale을 사용해서 느리거나 빠르게 조절할 수 있는데,   
+    이 값의 변화에 영향을 받는 것이 2번, 무관한 것이 3번이다.   
+[출처](https://velog.io/@uchang903/UnityCoroutine%EC%BD%94%EB%A3%A8%ED%8B%B4%EC%9D%98-%EA%B0%9C%EB%85%90%EA%B3%BC-%ED%99%9C%EC%9A%A9)   
+[출처](https://kotlinworld.com/214)   
+[출처](https://coding-of-today.tistory.com/171#:~:text=%EC%9A%B0%EC%84%A0%2C%20%EC%BD%94%EB%A3%A8%ED%8B%B4%EC%9D%B4%20%EC%96%B4%EB%96%A4,%ED%95%98%EB%8A%94%20%EA%B2%83%EC%9D%B4%20%EB%A7%A4%EC%9A%B0%20%ED%9A%A8%EA%B3%BC%EC%A0%81%EC%9D%B4%EB%8B%A4.)   
 
 
+### Coroutine VS Invoke   
