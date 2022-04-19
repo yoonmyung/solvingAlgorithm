@@ -385,6 +385,23 @@ class를 구분해서 효율을 높이기 위해 만들어진 개념
 using [namespace이름]; 형태로 사용하며, 이는 namespace에 포함된 모든 클래스를 사용하겠다는 의미이다.   
 
 
+### using
+1. namespace 참조시
+2. IDispose 인터페이스에게 상속받은 클래스들(Dispose()를 갖고있음)을 특정 블록 안에서만 사용시 => 자원을 효율적으로 사용할 수 있음   
+```
+private void GetData()
+{
+    using (var reader = new StreamReader("src.txt"))
+    { 
+        string data = reader.ReadToEnd();
+        Debug.WriteLine(data);
+    }  // 여기서 Dispose() 호출됨
+
+    // ...
+    Debug.WriteLine("...");
+}
+```
+
 ### Array(배열) VS ArrayList VS List<>
 ||Array|ArrayList|List<>|
 |:-:|:--------:|:--------:|:---:|
@@ -574,3 +591,15 @@ void Update()
   원하는 함수를 일정 시간 후에 호출하거나 일정 시간마다 반복해서 호출할 수 있게 해주는 기능을 제공한다.   
   인보크는 함수를 문자열로 된 이름으로 찾아서 사용하고 있습니다.
   이때 C#의 리플렉션이라는 기능을 사용하게 되는데, 직접 함수를 호출하는 것에 비해서 느림.   
+
+### 쉐이더
+  화면에 출력될 픽셀의 색상과 좌표를 계산하는 함수   
+  렌더링 파이프라인을 따른다.   
+  
+### 렌더링 파이프라인   
+  ![image](https://user-images.githubusercontent.com/40621689/164011432-0f740468-d2b6-4c18-a65e-a4296c15ae9e.png)   
+  [출처](https://icechou.tistory.com/298)   
+  1. 정점 쉐이더
+    오브젝트의 각 정점(vertex)을 화면상 좌표로 변환하는 작업 수행   
+    
+  2. 
