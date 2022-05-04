@@ -9,12 +9,14 @@ int Bigger(int A, int B) { if (A > B) return A; return B; }
  
 int solution(vector<int> money)
 {
+    // 인덱스 0의 집이 점화식의 1번째 항 역할을 한다.
     vector<int> DP(money.size());
-    vector<int>DP2(money.size());
+    vector<int> DP2(money.size());
 
     // 인덱스 0의 집을 방문한 경우
     DP[0] = money[0];
     DP[1] = DP[0];
+    // 인덱스 n-1의 집을 방문할 수 없으므로 money.size()-2까지만 반복문이 돈다.
     for (int i = 2; i < money.size()-1; i++)
     {
         DP[i] = Bigger(DP[i - 2] + money[i], DP[i - 1]);
@@ -23,12 +25,13 @@ int solution(vector<int> money)
     // 인덱스 0의 집을 방문하지 않은 경우
     DP2[0] = 0;
     DP2[1] = money[1];
+    // 인덱스 n-1의 집을 방문할 수 있으므로 money.size()-1까지 반복문이 돈다.
     for (int i = 2; i <= money.size()-1; i++)
     {
         DP2[i] = Bigger(DP2[i - 2] + money[i], DP2[i - 1]);
     }
     
-    return Bigger(DP[money.size() - 2], DP2[money.size()-1]);
+    return Bigger(DP[money.size()-2], DP2[money.size()-1]);
 }
 
 
